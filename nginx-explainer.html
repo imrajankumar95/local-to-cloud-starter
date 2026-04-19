@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nginx + Progress Visual</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; padding: 32px 24px; }
+    h2 { color: #38bdf8; font-size: 1.1rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 16px; }
+    .section { margin-bottom: 40px; }
+
+    /* ── NGINX DIAGRAM ── */
+    .flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; justify-content: center; margin: 24px 0; }
+    .box { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 14px 20px; text-align: center; min-width: 110px; }
+    .box .icon { font-size: 1.8rem; margin-bottom: 6px; }
+    .box .label { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+    .box .name { font-size: 14px; font-weight: 600; color: #f1f5f9; }
+    .box.nginx { border-color: #0ea5e9; background: #0c1a2e; }
+    .box.nginx .name { color: #38bdf8; }
+    .arrow { font-size: 1.4rem; color: #475569; padding: 0 6px; }
+    .arrow-label { font-size: 11px; color: #64748b; text-align: center; }
+    .arrow-wrap { display: flex; flex-direction: column; align-items: center; padding: 0 4px; }
+
+    /* ── WHAT NGINX DOES ── */
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-top: 16px; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 18px; }
+    .card .icon { font-size: 1.5rem; margin-bottom: 10px; }
+    .card h3 { font-size: 13px; font-weight: 600; color: #f1f5f9; margin-bottom: 6px; }
+    .card p { font-size: 12px; color: #94a3b8; line-height: 1.5; }
+
+    /* ── PROGRESS ── */
+    .steps { display: flex; flex-direction: column; gap: 0; margin-top: 16px; }
+    .step { display: flex; gap: 16px; align-items: flex-start; }
+    .step-left { display: flex; flex-direction: column; align-items: center; }
+    .dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+    .dot.done { background: #16a34a; color: #fff; }
+    .dot.next { background: #1e40af; color: #fff; }
+    .dot.future { background: #1e293b; border: 1px solid #334155; color: #64748b; }
+    .line { width: 2px; height: 28px; background: #1e293b; margin: 4px 0; }
+    .line.done { background: #16a34a44; }
+    .step-content { padding-bottom: 20px; }
+    .step-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .step-title.done { color: #4ade80; }
+    .step-title.next { color: #60a5fa; }
+    .step-title.future { color: #64748b; }
+    .step-desc { font-size: 12px; color: #64748b; line-height: 1.5; }
+    .tag { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 99px; margin-right: 4px; margin-top: 4px; }
+    .tag.green { background: #052e16; color: #4ade80; border: 1px solid #16a34a; }
+    .tag.blue { background: #0f172a; color: #60a5fa; border: 1px solid #1d4ed8; }
+    .tag.gray { background: #0f172a; color: #64748b; border: 1px solid #334155; }
+
+    /* ── REQUEST EXAMPLE ── */
+    .request-box { background: #020617; border: 1px solid #1e293b; border-radius: 10px; padding: 20px; margin-top: 16px; font-family: monospace; font-size: 12px; line-height: 1.8; }
+    .c-gray { color: #475569; }
+    .c-blue { color: #38bdf8; }
+    .c-green { color: #4ade80; }
+    .c-yellow { color: #fbbf24; }
+    .c-purple { color: #a78bfa; }
+
+    .divider { border: none; border-top: 1px solid #1e293b; margin: 40px 0; }
+  </style>
+</head>
+<body>
+
+  <!-- ── SECTION 1: WHAT IS NGINX ── -->
+  <div class="section">
+    <h2>What is Nginx?</h2>
+
+    <div class="flow">
+      <div class="box">
+        <div class="icon">🧑‍💻</div>
+        <div class="name">You</div>
+        <div class="label">Windows Browser<br/>localhost</div>
+      </div>
+      <div class="arrow-wrap">
+        <div class="arrow-label">GET /</div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="box nginx">
+        <div class="icon">⚙️</div>
+        <div class="name">Nginx</div>
+        <div class="label">Listens on port 80<br/>inside WSL Ubuntu</div>
+      </div>
+      <div class="arrow-wrap">
+        <div class="arrow-label">serves file</div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="box">
+        <div class="icon">📄</div>
+        <div class="name">index.html</div>
+        <div class="label">/var/www/html/<br/>on disk</div>
+      </div>
+      <div class="arrow-wrap">
+        <div class="arrow-label">HTML response</div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="box">
+        <div class="icon">🌐</div>
+        <div class="name">Your App</div>
+        <div class="label">Rendered in<br/>browser</div>
+      </div>
+    </div>
+
+    <p style="font-size:13px; color:#64748b; text-align:center; margin-bottom:24px;">
+      Nginx sits between the browser and your files — it receives requests and decides what to send back.
+    </p>
+
+    <div class="cards">
+      <div class="card">
+        <div class="icon">📦</div>
+        <h3>Web Server</h3>
+        <p>Serves static files (HTML, CSS, images) directly from disk to the browser.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🔀</div>
+        <h3>Reverse Proxy</h3>
+        <p>In production, forwards requests to your app (Flask, Node) and returns the response.</p>
+      </div>
+      <div class="card">
+        <div class="icon">⚖️</div>
+        <h3>Load Balancer</h3>
+        <p>Splits traffic across multiple app instances so no single one gets overwhelmed.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🔒</div>
+        <h3>SSL Termination</h3>
+        <p>Handles HTTPS encryption so your app code doesn't have to deal with it.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- ── SECTION 2: REQUEST EXAMPLE ── -->
+  <div class="section">
+    <h2>What just happened when you opened localhost</h2>
+    <div class="request-box">
+      <span class="c-gray"># 1. You typed in browser:</span><br/>
+      <span class="c-blue">http://localhost</span><br/><br/>
+
+      <span class="c-gray"># 2. Browser sent this HTTP request to port 80:</span><br/>
+      <span class="c-yellow">GET</span> <span class="c-green">/ HTTP/1.1</span><br/>
+      <span class="c-purple">Host:</span> localhost<br/><br/>
+
+      <span class="c-gray"># 3. Nginx received it, looked at its config:</span><br/>
+      <span class="c-blue">root /var/www/html</span>  <span class="c-gray">← where to look for files</span><br/>
+      <span class="c-blue">index index.html</span>     <span class="c-gray">← default file to serve</span><br/><br/>
+
+      <span class="c-gray"># 4. Found /var/www/html/index.html → sent it back</span><br/>
+      <span class="c-green">200 OK</span> → your dark themed app appeared ✅
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- ── SECTION 3: PROGRESS ── -->
+  <div class="section">
+    <h2>Where we are in the journey</h2>
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-left">
+          <div class="dot done">✓</div>
+          <div class="line done"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-title done">Phase 1 — Dev Environment</div>
+          <div class="step-desc">WSL 2 Ubuntu + Docker 29.3.1 + Terraform + Git — all verified and running.</div>
+          <span class="tag green">WSL 2</span><span class="tag green">Docker</span><span class="tag green">Terraform</span><span class="tag green">Git</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-left">
+          <div class="dot done">✓</div>
+          <div class="line done"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-title done">Phase 2A — HTML App on Nginx</div>
+          <div class="step-desc">Installed Nginx, created index.html, served app at localhost. You saw it in the browser.</div>
+          <span class="tag green">Nginx</span><span class="tag green">HTML</span><span class="tag green">localhost ✅</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-left">
+          <div class="dot done">✓</div>
+          <div class="line done"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-title done">Phase 2B — Containerize with Docker</div>
+          <div class="step-desc">Wrote Dockerfile, built my-cloud-app:v1 image, ran container at localhost:8080.</div>
+          <span class="tag green">Dockerfile</span><span class="tag green">docker build</span><span class="tag green">docker run ✅</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-left">
+          <div class="dot done">✓</div>
+          <div class="line done"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-title done">Phase 2C — Push to Docker Hub</div>
+          <div class="step-desc">Tagged image with Docker Hub username, pushed it. App now publicly available on Docker Hub.</div>
+          <span class="tag green">docker tag</span><span class="tag green">docker push</span><span class="tag green">Docker Hub ✅</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-left">
+          <div class="dot next">→</div>
+          <div class="line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-title next">Phase 3 — The Migration Arc</div>
+          <div class="step-desc">Flask API + GitHub repo + GitHub Actions CI/CD pipeline. Automated build → test → push on every commit.</div>
+          <span class="tag blue">Flask</span><span class="tag blue">GitHub</span><span class="tag blue">GitHub Actions</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-left">
+          <div class="dot future">5</div>
+          <div class="line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-title future">Phase 4 — Azure Deployment</div>
+          <div class="step-desc">Terraform provisions ACR + AKS. Pipeline deploys Flask app to Azure Kubernetes Service.</div>
+          <span class="tag gray">Terraform</span><span class="tag gray">ACR</span><span class="tag gray">AKS</span><span class="tag gray">Azure</span>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-left">
+          <div class="dot future">6</div>
+          <div class="line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-title future">Phase 5 — Migrate to AWS</div>
+          <div class="step-desc">Terraform provisions ECR + EKS. Same app migrates from Azure to AWS — completing the arc.</div>
+          <span class="tag gray">ECR</span><span class="tag gray">EKS</span><span class="tag gray">AWS</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My App — Local to Cloud</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 48px 56px;
+      max-width: 520px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+
+    .badge {
+      display: inline-block;
+      background: #0ea5e9;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      padding: 4px 14px;
+      border-radius: 99px;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #f8fafc;
+    }
+
+    p {
+      color: #94a3b8;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    .stack {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+
+    .tag {
+      background: #0f172a;
+      border: 1px solid #475569;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+
+    .status {
+      background: #052e16;
+      border: 1px solid #16a34a;
+      color: #4ade80;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .status::before {
+      content: "● ";
+      color: #22c55e;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <span class="badge">Phase 2 — First Project</span>
+    <h1>Local → Cloud Migration</h1>
+    <p>
+      This app started as a plain HTML file served by Nginx on a Vagrant VM.
+      Now it's containerized with Docker — ready to ship anywhere.
+    </p>
+    <div class="stack">
+      <span class="tag">Vagrant</span>
+      <span class="tag">Nginx</span>
+      <span class="tag">Docker</span>
+      <span class="tag">Cloud-Ready</span>
+    </div>
+    <div class="status">App is running successfully</div>
+  </div>
+</body>
+</html>
